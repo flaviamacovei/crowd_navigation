@@ -8,14 +8,17 @@ public class Boundary : MonoBehaviour
     public float exitPc = 0.5f;
     public GameObject player;
     readonly int dpi = 600;
+    private Sprite boundary;
+    private SpriteRenderer sr;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Texture2D texture = createTexture();
+        Texture2D texture = CreateTexture();
+        CreateSprite(texture);
     }
 
-    private Texture2D createTexture()
+    private Texture2D CreateTexture()
     {
         float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
         int pxWidth = (int)(width * referenceSize * dpi);
@@ -58,10 +61,20 @@ public class Boundary : MonoBehaviour
                 }
             }
         }
-        byte[] bytes = texture.EncodeToPNG();
-        System.IO.File.WriteAllBytes("Assets/Scripts/boundary.png", bytes);
+        texture.Apply();
         return texture;
-        
+    }
+
+    private void CreateSprite(Texture2D texture)
+    {
+        sr = gameObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
+        boundary = Sprite.Create(
+            texture,
+            new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f),
+            dpi
+        );
+        sr.sprite = boundary;
     }
 
     // Update is called once per frame
