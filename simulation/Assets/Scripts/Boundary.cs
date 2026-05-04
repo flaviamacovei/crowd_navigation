@@ -2,16 +2,24 @@ using UnityEngine;
 
 public class Boundary : MonoBehaviour
 {
+    public static Boundary SharedInstance;
+    
     public int width = 10;
     public int height = 10;
     public int borderWidth = 1;
     public float exitPc = 0.5f;
     public GameObject player;
     readonly int dpi = 600;
+    private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Awake()
+    {
+        SharedInstance = this;
+    }
+    
     void Start()
     {
         Texture2D texture = CreateTexture();
@@ -67,7 +75,8 @@ public class Boundary : MonoBehaviour
 
     private void CreateSprite(Texture2D texture)
     {
-        sr = gameObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
+        boundaryObject = new GameObject("boundary");
+        sr = boundaryObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
         boundary = Sprite.Create(
             texture,
             new Rect(0, 0, texture.width, texture.height),
@@ -75,6 +84,23 @@ public class Boundary : MonoBehaviour
             dpi
         );
         sr.sprite = boundary;
+    }
+
+    public Bounds GetSpawningBounds()
+    {
+        Vector2 centre = sr.bounds.center;
+        Vector2 size = sr.bounds.size;
+        // w      -> s
+        // w - 2b -> x
+        // x = ((w - 2b) * s) / w
+        // x = (1 - 2b/w) * s
+        Vector2 spawnSize = size * (new Vector2(1, 1) - new Vector2(2 * borderWidth, 2 * borderWidth) / new Vector2(width, height));
+        return new Bounds(centre, spawnSize);
+    }
+
+    public static Boundary GetInstance()
+    {
+        return SharedInstance;
     }
 
     // Update is called once per frame
