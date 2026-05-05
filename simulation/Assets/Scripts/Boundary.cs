@@ -126,13 +126,12 @@ public class Boundary : MonoBehaviour
     {
         Vector2 centre = sr.bounds.center;
         Vector2 size = sr.bounds.size;
-        // w      -> s
-        // w - 2b -> x
-        // x = ((w - 2b) * s) / w
-        // x = (1 - 2b/w) * s
-        Vector2 spawnSize = Rectangle.Texture2World(new Vector2(width - 2 * borderWidth, height - 2 * borderWidth));
-        Debug.Log("spawnSize: " + spawnSize);
-        return new Bounds(centre, spawnSize);
+
+        Vector2 spawnPercent = new Vector2(1.0f - 2.0f * (float)borderWidth / (float)width, 1 - 2.0f * (float)borderWidth / (float)height);
+        Vector2 spawnSizeTexture = Rectangle.World2Texture(size) * spawnPercent;
+        Vector2 spawnSizeWorld = Rectangle.Texture2World(spawnSizeTexture);
+        
+        return new Bounds(centre, spawnSizeWorld);
     }
 
     public static Boundary GetInstance()
