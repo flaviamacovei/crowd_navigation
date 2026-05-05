@@ -7,17 +7,14 @@ public class Rectangle
     /// Can be transformed between texture and world spaces.
     /// Assumption: world space is centered at (0,0); texture space has (0,0) in bottom left corner.
     /// </summary>
-    private Vector2 worldSize;
-    private Vector2 textureSize;
+    private static Vector2 worldSize;
+    private static Vector2 textureSize;
     private Bounds worldBounds;
     private Bounds textureBounds;
     
-    public Rectangle(Vector2 point1, Vector2 point2, string space, Vector2 worldSize, Vector2 textureSize)
+    public Rectangle(Vector2 point1, Vector2 point2, string space)
     {
-        Assert.IsTrue(space == "world" || space == "texture");
-
-        worldSize = worldSize;
-        textureSize = textureSize;
+        // Assert.IsTrue(space == "world" || space == "texture");
         
         Vector2 centre = (point1 + point2) / 2f;
         float minX = Math.Min(point1.x, point2.x);
@@ -28,41 +25,56 @@ public class Rectangle
         if (space == "world")
         {
             worldBounds = new Bounds(centre, new Vector2(maxX - minX, maxY - minY));
-            textureBounds = World2Texture(worldBounds);
+            textureBounds = new Bounds(new Vector2(0, 0), World2Texture(worldBounds.size));
         }
         else
         {
             textureBounds = new Bounds(centre, new Vector2(maxX - minX, maxY - minY));
-            worldBounds = Texture2World(textureBounds);
+            worldBounds = new Bounds(new Vector2(0, 0), Texture2World(textureBounds.size));
         }
     }
 
-    public static Vector2 World2Texture(Bounds bounds)
+    public static void SetWorldSize(Vector2 size)
     {
-        // move
-        Vector2 newCentre = bounds.center + (textureBounds.center - worldBounds.center);
-
-        // scale
-        // worldSize -> textureSize
-        // size      -> x
-        // x = size * textureSize / worldSize
-        Vector2 newSize = bounds.size * textureBounds.size / worldBounds.size;
-
-        return new Bounds(newCentre, newSize);
+        worldSize = size;
+    }
+    public static void SetTextureSize(Vector2 size)
+    {
+        textureSize = size;
+    }
+    public static Vector2 GetWorldSize()
+    {
+        return worldSize;
+    }
+    public static Vector2 GetTextureSize()
+    {
+        return textureSize;
+    }
+    
+    public Bounds GetWorldBounds()
+    {
+        return worldBounds;
     }
 
-    public static Vector2 Texture2World(Bounds bounds)
+    public Bounds GetTextureBounds()
     {
-        // move
-        Vector2 newCentre = bounds.center - (worldBounds.center - textureBounds.center);
+        return textureBounds;
+    }
 
-        // scale
+    public static Vector2 World2Texture(Vector2 point)
+    {
+        // worldSize -> textureSize
+        // point      -> x
+        // x = point * textureSize / worldSize
+        return point * textureSize / worldSize;
+    }
+
+    public static Vector2 Texture2World(Vector2 point)
+    {
         // textureSize -> worldSize
-        // size        -> x
-        // x = size * worldSize / textureSize
-        Vector2 newSize = bounds.size * worldBounds.size / textureBounds.size;
-
-        return new Bounds(newCentre, newSize);
+        // point        -> x
+        // x = point * worldSize / textureSize
+        return point * worldSize / textureSize;
     }
 
 }
