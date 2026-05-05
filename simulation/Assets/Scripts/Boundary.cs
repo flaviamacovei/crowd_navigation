@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Boundary : MonoBehaviour
 {
@@ -10,35 +11,48 @@ public class Boundary : MonoBehaviour
     public float exitPc = 0.5f;
     public GameObject player;
     readonly int dpi = 600;
+    private List<Rectangle> border;
     private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
+    private Vector2 textureSize;
+
+    private float referenceSize;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        referenceSize = player.GetComponent<Renderer>().bounds.size.x;
         SharedInstance = this;
+        CreateGameObject();
+        CreateBorderPoints();
+        Texture2D texture = CreateTexture();
+        CreateSprite(texture);
+        CreateCollider();
     }
     
     void Start()
     {
-        Texture2D texture = CreateTexture();
-        CreateSprite(texture);
+        
     }
 
-    private Texture2D CreateTexture()
+    private void CreateGameObject()
     {
-        float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
+        boundaryObject = new GameObject("boundary");
+        sr = boundaryObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
+    }
+
+    private void CreateBorderPoints()
+    {
         int pxWidth = (int)(width * referenceSize * dpi);
         int pxHeight = (int)(height * referenceSize * dpi);
+
+        Rectangle.SetTextureSize(new Vector2(pxWidth, pxHeight));
+
         int pxBorderWidth = (int)(borderWidth * referenceSize * dpi);
         int exitStart = (int)(pxHeight * exitPc - pxBorderWidth / 2);
         int exitEnd = (int)(pxHeight * exitPc + pxBorderWidth / 2);
-        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGB24, false);
-
-        Color transparent = new Color(0, 0, 0, 0);
-        Color white = Color.white;
-
+        
         Vector2 a = new Vector2(0, 0);
         Vector2 b = new Vector2(pxWidth - pxBorderWidth, 0);
         Vector2 c = new Vector2(pxWidth, pxHeight);
@@ -48,22 +62,45 @@ public class Boundary : MonoBehaviour
         Vector2 g = new Vector2(pxBorderWidth, pxBorderWidth);
         Vector2 h = new Vector2(pxBorderWidth, exitStart);
 
-        for (int y = 0; y < pxHeight; y++)
+        Rectangle bottomLeft = new Rectangle(a, h, "texture");
+        Rectangle bottom = new Rectangle(b, g, "texture");
+        Rectangle right = new Rectangle(b, c, "texture");
+        Rectangle top = new Rectangle(d, f, "texture");
+        Rectangle topLeft = new Rectangle(d, e, "texture");
+
+        border = new List<Rectangle> {bottomLeft, bottom, right, top, topLeft} ;
+    }
+
+    private void CreateCollider()
+    {
+        boundaryObject.AddComponent<BoxCollider2D>();
+    }
+    
+    private Texture2D CreateTexture()
+    {
+        float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
+        int pxWidth = (int)(width * referenceSize * dpi);
+        int pxHeight = (int)(height * referenceSize * dpi); // THIS IS DUPLICATED FIX
+        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGBA32, false);
+
+        Color transparent = new Color(0, 0, 0, 0);
+        Color white = Color.white;
+
+        for (int y = 0; y < texture.height; y++)
         {
-            for (int x = 0; x < pxWidth; x++)
+            for (int x = 0; x < texture.width; x++)
             {
-                Vector2 pos = new Vector2(x, y);
-                if (
-                    a.x <= x && x <= h.x && a.y <= y && y <= h.y || // bottom left rectangle
-                    g.x <= x && x <= b.x && b.y <= y && y <= g.y || // bottom rectangle
-                    b.x <= x && x <= c.x && b.y <= y && y <= c.y || // right rectangle
-                    d.x <= x && x <= f.x && f.y <= y && y <= d.y || // top rectangle
-                    e.x <= x && x <= d.x && e.y <= y && y <= d.y // top left rectangle
-                )
+                Vector2 px = new Vector2(x, y);
+                bool inRectangle = false;
+                for (int i = 0; i < border.Count; i++)
                 {
-                    texture.SetPixel(x, y, white);
+                    if (border[i].GetTextureBounds().Contains(px))
+                    {
+                        texture.SetPixel(x, y, white);
+                        inRectangle = true;
+                    }
                 }
-                else
+                if (!inRectangle)
                 {
                     texture.SetPixel(x, y, transparent);
                 }
@@ -75,8 +112,6 @@ public class Boundary : MonoBehaviour
 
     private void CreateSprite(Texture2D texture)
     {
-        boundaryObject = new GameObject("boundary");
-        sr = boundaryObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
         boundary = Sprite.Create(
             texture,
             new Rect(0, 0, texture.width, texture.height),
@@ -84,6 +119,7 @@ public class Boundary : MonoBehaviour
             dpi
         );
         sr.sprite = boundary;
+        Rectangle.SetWorldSize(sr.bounds.size);
     }
 
     public Bounds GetSpawningBounds()
@@ -94,7 +130,8 @@ public class Boundary : MonoBehaviour
         // w - 2b -> x
         // x = ((w - 2b) * s) / w
         // x = (1 - 2b/w) * s
-        Vector2 spawnSize = size * (new Vector2(1, 1) - new Vector2(2 * borderWidth, 2 * borderWidth) / new Vector2(width, height));
+        Vector2 spawnSize = Rectangle.Texture2World(new Vector2(width - 2 * borderWidth, height - 2 * borderWidth));
+        Debug.Log("spawnSize: " + spawnSize);
         return new Bounds(centre, spawnSize);
     }
 
