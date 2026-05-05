@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Boundary : MonoBehaviour
 {
@@ -11,13 +12,14 @@ public class Boundary : MonoBehaviour
     public float exitPc = 0.5f;
     public GameObject player;
     readonly int dpi = 600;
-    private List<Rectangle> border;
+    private List<Rectangle> rectangles;
     private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
     private Vector2 textureSize;
 
     private float referenceSize;
+    private List<BoxCollider2D> colliders;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -68,7 +70,7 @@ public class Boundary : MonoBehaviour
         Rectangle top = new Rectangle(d, f, "texture");
         Rectangle topLeft = new Rectangle(d, e, "texture");
 
-        border = new List<Rectangle> {bottomLeft, bottom, right, top, topLeft} ;
+        rectangles = new List<Rectangle> {bottomLeft, bottom, right, top, topLeft} ;
     }
 
     private void CreateCollider()
@@ -91,16 +93,17 @@ public class Boundary : MonoBehaviour
             for (int x = 0; x < texture.width; x++)
             {
                 Vector2 px = new Vector2(x, y);
-                bool inRectangle = false;
-                for (int i = 0; i < border.Count; i++)
+
+                IEnumerable<bool> inRectangles =
+                    from rectangle in rectangles
+                    where rectangle.GetTextureBounds().Contains(px)
+                    select true;
+                bool inRectangle = inRectangles.Any();
+                if (inRectangle)
                 {
-                    if (border[i].GetTextureBounds().Contains(px))
-                    {
-                        texture.SetPixel(x, y, white);
-                        inRectangle = true;
-                    }
+                    texture.SetPixel(x, y, white);
                 }
-                if (!inRectangle)
+                else
                 {
                     texture.SetPixel(x, y, transparent);
                 }
