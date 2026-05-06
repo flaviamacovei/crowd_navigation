@@ -20,22 +20,30 @@ public class Boundary : MonoBehaviour
 
     private float referenceSize;
     private List<BoxCollider2D> colliders;
+    private CompositeCollider2D compositeCollider;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         referenceSize = player.GetComponent<Renderer>().bounds.size.x;
+
+        // set rectangle sizes
+        Vector2 worldSize = new Vector2(width * referenceSize, height * referenceSize);
+        Rectangle.SetWorldSize(worldSize);
+        Vector2 textureSize = new Vector2(width * referenceSize * dpi, height * referenceSize * dpi);
+        Rectangle.SetTextureSize(textureSize);
+
+
         SharedInstance = this;
         CreateGameObject();
         CreateBorderPoints();
         Texture2D texture = CreateTexture();
         CreateSprite(texture);
-        CreateCollider();
     }
     
     void Start()
     {
-        
+        CreateCollider();
     }
 
     private void CreateGameObject()
@@ -48,8 +56,6 @@ public class Boundary : MonoBehaviour
     {
         int pxWidth = (int)(width * referenceSize * dpi);
         int pxHeight = (int)(height * referenceSize * dpi);
-
-        Rectangle.SetTextureSize(new Vector2(pxWidth, pxHeight));
 
         int pxBorderWidth = (int)(borderWidth * referenceSize * dpi);
         int exitStart = (int)(pxHeight * exitPc - pxBorderWidth / 2);
@@ -75,7 +81,23 @@ public class Boundary : MonoBehaviour
 
     private void CreateCollider()
     {
-        boundaryObject.AddComponent<BoxCollider2D>();
+        // add partial colliders
+        colliders = new List<BoxCollider2D>();
+        for (int i = 0; i < rectangles.Count; i++)
+        {
+            Bounds rectangleBounds = rectangles[i].GetWorldBounds();
+            BoxCollider2D collider = boundaryObject.AddComponent<BoxCollider2D>();
+            collider.offset = rectangleBounds.center;
+            collider.size = rectangleBounds.size;
+            colliders.Add(collider);
+        }
+        // merge into composite collider
+        compositeCollider = boundaryObject.AddComponent<CompositeCollider2D>();
+
+        // remove gravity
+        Rigidbody2D rigidBody = boundaryObject.GetComponent<Rigidbody2D>();
+        rigidBody.bodyType = RigidbodyType2D.Kinematic;
+
     }
     
     private Texture2D CreateTexture()
@@ -83,7 +105,7 @@ public class Boundary : MonoBehaviour
         float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
         int pxWidth = (int)(width * referenceSize * dpi);
         int pxHeight = (int)(height * referenceSize * dpi); // THIS IS DUPLICATED FIX
-        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGBA32, false);
+        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGB24, false);
 
         Color transparent = new Color(0, 0, 0, 0);
         Color white = Color.white;
@@ -110,6 +132,8 @@ public class Boundary : MonoBehaviour
             }
         }
         texture.Apply();
+        byte[] bytes = texture.EncodeToPNG();
+        System.IO.File.WriteAllBytes("Assets/Scripts/boundary.png", bytes);	
         return texture;
     }
 
@@ -122,7 +146,6 @@ public class Boundary : MonoBehaviour
             dpi
         );
         sr.sprite = boundary;
-        Rectangle.SetWorldSize(sr.bounds.size);
     }
 
     public Bounds GetSpawningBounds()
@@ -131,8 +154,9 @@ public class Boundary : MonoBehaviour
         Vector2 size = sr.bounds.size;
 
         Vector2 spawnPercent = new Vector2(1.0f - 2.0f * (float)borderWidth / (float)width, 1 - 2.0f * (float)borderWidth / (float)height);
-        Vector2 spawnSizeTexture = Rectangle.World2Texture(size) * spawnPercent;
-        Vector2 spawnSizeWorld = Rectangle.Texture2World(spawnSizeTexture);
+        Vector2 spawnSizeTexture = Rectangle.ResizeWorld2Texture(size) * spawnPercent;
+        Vector2 spawnCentreTexture = new Vector2(0,0);
+        Vector2 spawnSizeWorld = Rectangle.ResizeTexture2World(spawnSizeTexture);
         
         return new Bounds(centre, spawnSizeWorld);
     }
