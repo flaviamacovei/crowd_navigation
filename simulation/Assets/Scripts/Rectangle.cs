@@ -21,16 +21,18 @@ public class Rectangle
         float maxX = Math.Max(point1.x, point2.x);
         float minY = Math.Min(point1.y, point2.y);
         float maxY = Math.Max(point1.y, point2.y);
+        Vector2 size = new Vector2(maxX - minX, maxY - minY);
+        Bounds setBounds = new Bounds(centre, size);
 
         if (space == "world")
         {
-            worldBounds = new Bounds(centre, new Vector2(maxX - minX, maxY - minY));
-            textureBounds = new Bounds(new Vector2(0, 0), World2Texture(worldBounds.size));
+            worldBounds = setBounds;
+            textureBounds = ConvertWorld2Texture(setBounds);
         }
         else
         {
-            textureBounds = new Bounds(centre, new Vector2(maxX - minX, maxY - minY));
-            worldBounds = new Bounds(new Vector2(0, 0), Texture2World(textureBounds.size));
+            textureBounds = setBounds;
+            worldBounds = ConvertTexture2World(setBounds);
         }
     }
 
@@ -61,20 +63,42 @@ public class Rectangle
         return textureBounds;
     }
 
-    public static Vector2 World2Texture(Vector2 point)
+    public static Bounds ConvertWorld2Texture(Bounds bounds)
     {
-        // worldSize -> textureSize
-        // point      -> x
-        // x = point * textureSize / worldSize
-        return point * textureSize / worldSize;
+        Vector2 oldSize = bounds.size;
+        Vector2 oldCentre = bounds.center;
+
+        Vector2 newSize = ResizeWorld2Texture(oldSize);
+        Vector2 newCentre = (oldCentre + (worldSize / 2)) * (textureSize / worldSize);
+
+        return new Bounds(newCentre, newSize);
     }
 
-    public static Vector2 Texture2World(Vector2 point)
+    public static Bounds ConvertTexture2World(Bounds bounds)
+    {
+        Vector2 oldSize = bounds.size;
+        Vector2 oldCentre = bounds.center;
+
+        Vector2 newSize = ResizeTexture2World(oldSize);
+        Vector2 newCentre = (oldCentre - (textureSize / 2)) * (worldSize / textureSize);    
+
+        return new Bounds(newCentre, newSize);
+    }
+    
+    public static Vector2 ResizeWorld2Texture(Vector2 size)
+    {
+        // worldSize -> textureSize
+        // size      -> x
+        // x = size * textureSize / worldSize
+        return size * textureSize / worldSize;
+    }
+
+    public static Vector2 ResizeTexture2World(Vector2 size)
     {
         // textureSize -> worldSize
-        // point        -> x
-        // x = point * worldSize / textureSize
-        return point * worldSize / textureSize;
+        // size        -> x
+        // x = size * worldSize / textureSize
+        return size * worldSize / textureSize;
     }
 
 }
