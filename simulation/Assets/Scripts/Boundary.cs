@@ -12,14 +12,14 @@ public class Boundary : MonoBehaviour
     public float exitPc = 0.5f;
     public GameObject player;
     readonly int dpi = 600;
-    private List<Rectangle> rectangles;
+    private Rectangle[] rectangles;
     private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
     private Vector2 textureSize;
 
     private float referenceSize;
-    private List<BoxCollider2D> colliders;
+    private BoxCollider2D[] colliders;
     private CompositeCollider2D compositeCollider;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -76,20 +76,20 @@ public class Boundary : MonoBehaviour
         Rectangle top = new Rectangle(d, f, "texture");
         Rectangle topLeft = new Rectangle(d, e, "texture");
 
-        rectangles = new List<Rectangle> {bottomLeft, bottom, right, top, topLeft} ;
+        rectangles = new[] { bottomLeft, bottom, right, top, topLeft };
     }
 
     private void CreateCollider()
     {
         // add partial colliders
-        colliders = new List<BoxCollider2D>();
-        for (int i = 0; i < rectangles.Count; i++)
+        colliders = new BoxCollider2D[rectangles.Length];
+        for (int i = 0; i < rectangles.Length; i++)
         {
             Bounds rectangleBounds = rectangles[i].GetWorldBounds();
             BoxCollider2D collider = boundaryObject.AddComponent<BoxCollider2D>();
             collider.offset = rectangleBounds.center;
             collider.size = rectangleBounds.size;
-            colliders.Add(collider);
+            colliders[i] = collider;
         }
         // merge into composite collider
         compositeCollider = boundaryObject.AddComponent<CompositeCollider2D>();
@@ -105,7 +105,7 @@ public class Boundary : MonoBehaviour
         float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
         int pxWidth = (int)(width * referenceSize * dpi);
         int pxHeight = (int)(height * referenceSize * dpi); // THIS IS DUPLICATED FIX
-        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGB24, false);
+        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGBA32, false);
 
         Color transparent = new Color(0, 0, 0, 0);
         Color white = Color.white;
@@ -131,9 +131,7 @@ public class Boundary : MonoBehaviour
                 }
             }
         }
-        texture.Apply();
-        byte[] bytes = texture.EncodeToPNG();
-        System.IO.File.WriteAllBytes("Assets/Scripts/boundary.png", bytes);	
+        texture.Apply();	
         return texture;
     }
 
