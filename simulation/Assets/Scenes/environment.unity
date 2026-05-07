@@ -349,9 +349,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1772429112}
+  - component: {fileID: 1772429115}
   - component: {fileID: 1772429113}
   - component: {fileID: 1772429114}
-  - component: {fileID: 1772429115}
+  - component: {fileID: 1772429116}
   m_Layer: 0
   m_Name: controller
   m_TagString: Untagged
@@ -403,6 +404,7 @@ MonoBehaviour:
   height: 10
   borderWidth: 1
   exitPc: 0.5
+  exitSize: 2
   player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
 --- !u!114 &1772429115
 MonoBehaviour:
@@ -417,6 +419,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
+--- !u!114 &1772429116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1772429111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1096c2acadd05244a5074ea3dc28629, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

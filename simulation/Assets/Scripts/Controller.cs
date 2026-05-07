@@ -7,6 +7,8 @@ public class PlayerControl : MonoBehaviour
 {
     public GameObject player;
     float objectRadius;
+    private Color playerColour = Color.red;
+    private Color npcColour = Color.white;
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -26,11 +28,11 @@ public class PlayerControl : MonoBehaviour
         positions.RemoveAt(playerIndex);
 
         // npcs have white colour
-        player.GetComponent<SpriteRenderer>().color = Color.white;
+        player.GetComponent<SpriteRenderer>().color = npcColour;
         ObjectPool.GetInstance().PlaceObjects(player, positions);
 
         // player has red colour
-        player.GetComponent<SpriteRenderer>().color = Color.red;
+        player.GetComponent<SpriteRenderer>().color = playerColour;
         Player.GetInstance().PlacePlayer(player, playerPosition);
     }
 

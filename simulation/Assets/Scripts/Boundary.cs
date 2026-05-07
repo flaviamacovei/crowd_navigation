@@ -10,6 +10,7 @@ public class Boundary : MonoBehaviour
     public int height = 10;
     public int borderWidth = 1;
     public float exitPc = 0.5f;
+    public int exitSize = 2;
     public GameObject player;
     readonly int dpi = 600;
     private Rectangle[] rectangles;
@@ -56,10 +57,23 @@ public class Boundary : MonoBehaviour
     {
         int pxWidth = (int)(width * referenceSize * dpi);
         int pxHeight = (int)(height * referenceSize * dpi);
+        int pxExitSize = (int)(exitSize * referenceSize * dpi);
 
         int pxBorderWidth = (int)(borderWidth * referenceSize * dpi);
-        int exitStart = (int)(pxHeight * exitPc - pxBorderWidth / 2);
-        int exitEnd = (int)(pxHeight * exitPc + pxBorderWidth / 2);
+        int exitStart = (int)(pxHeight * exitPc - pxExitSize / 2);
+        int exitEnd = (int)(pxHeight * exitPc + pxExitSize / 2);
+        if (exitStart < pxBorderWidth)
+        {
+            int offset = exitStart - pxBorderWidth;
+            exitStart = pxBorderWidth;
+            exitEnd += offset;
+        }
+        else if (exitEnd > pxHeight - pxBorderWidth)
+        {
+            int offset = exitEnd - (pxHeight - pxBorderWidth);
+            exitEnd = pxHeight - pxBorderWidth;
+            exitStart -= offset;
+        }
         
         Vector2 a = new Vector2(0, 0);
         Vector2 b = new Vector2(pxWidth - pxBorderWidth, 0);
