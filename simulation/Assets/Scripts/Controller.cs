@@ -12,6 +12,7 @@ public class PlayerControl : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
         Vector2 objectSize = player.GetComponent<Renderer>().bounds.size;
         objectRadius = Math.Max(objectSize.x, objectSize.y);
 
@@ -20,8 +21,17 @@ public class PlayerControl : MonoBehaviour
         Vector2 spawnSize = (Vector2)spawnBounds.size - new Vector2(objectRadius, objectRadius);
 
         List<Vector2> positions = GetSpawnPositions(objectRadius, new Bounds(spawnCentre, spawnSize));
+        int playerIndex = UnityEngine.Random.Range(0, positions.Count);
+        Vector2 playerPosition = positions[playerIndex];
+        positions.RemoveAt(playerIndex);
 
+        // npcs have white colour
+        player.GetComponent<SpriteRenderer>().color = Color.white;
         ObjectPool.GetInstance().PlaceObjects(player, positions);
+
+        // player has red colour
+        player.GetComponent<SpriteRenderer>().color = Color.red;
+        Player.GetInstance().PlacePlayer(player, playerPosition);
     }
 
     // Update is called once per frame
