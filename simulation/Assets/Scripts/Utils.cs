@@ -117,4 +117,31 @@ public static class Utils
         }
         return closestPoint;
     }
+
+    public static List<Color> GetNpcColours(List<Vector2> positions, Bounds bounds)
+    {
+        Color horizontalColour = Color.cyan;
+        Color verticalColour = Color.magenta;
+        Color baseColour = Color.white;
+        float basePercent = 0.8f;
+
+        float minX = bounds.min.x;
+        float maxX = bounds.max.x;
+        float minY = bounds.min.y;
+        float maxY = bounds.max.y;
+
+        List<Color> colours = new List<Color>();
+
+        for (int i = 0; i < positions.Count; i++)
+        {
+            Vector2 position = positions[i];
+            float percentHorizontal = (position.x - minX) / (maxX - minX);
+            float percentVertical = (position.y - minY) / (maxY - minY);
+            Color positionColour = (horizontalColour * percentHorizontal + verticalColour * percentVertical) / 2;
+            Color colour = basePercent * baseColour + (1 - basePercent) * positionColour;
+            colours.Add(colour);
+        }
+
+        return colours;
+    }
 }

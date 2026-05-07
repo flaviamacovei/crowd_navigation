@@ -8,8 +8,6 @@ public class Controller : MonoBehaviour
 {
     public GameObject player;
     float objectRadius;
-    private Color playerColour = Color.red;
-    private Color npcColour = Color.white;
     public float speed = 1.0f;
     private Vector2[] targetLineSegment;
 
@@ -33,13 +31,14 @@ public class Controller : MonoBehaviour
         Vector2 playerPosition = positions[playerIndex];
         positions.RemoveAt(playerIndex);
 
-        // npcs have white colour
-        player.GetComponent<SpriteRenderer>().color = npcColour;
-        NpcPool.GetInstance().PlaceObjects(player, positions);
+        // npcs get colour based on their position
+        List<Color> colours = Utils.GetNpcColours(positions, spawnBounds);
+        NpcPool.GetInstance().PlaceObjects(player, positions, colours);
 
         // player has red colour
-        player.GetComponent<SpriteRenderer>().color = playerColour;
+        player.GetComponent<SpriteRenderer>().color = Color.red;
         Player.GetInstance().PlacePlayer(player, playerPosition);
+
 
         // exit target
         targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
