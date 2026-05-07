@@ -175,6 +175,23 @@ public class Boundary : MonoBehaviour
         return new Bounds(centre, spawnSizeWorld);
     }
 
+    public Vector2[] GetTargetLineSegment()
+    {
+        Rectangle bottomLeft = rectangles[0];
+        Rectangle topLeft = rectangles[4];
+
+        Vector2 lowerEnd = new Vector2(
+            bottomLeft.GetWorldBounds().max.x,
+            bottomLeft.GetWorldBounds().max.y
+        );
+        Vector2 upperEnd = new Vector2(
+            topLeft.GetWorldBounds().max.x,
+            topLeft.GetWorldBounds().min.y
+        );
+
+        return new[] { lowerEnd, upperEnd };
+    }
+
     public static Boundary GetInstance()
     {
         return SharedInstance;

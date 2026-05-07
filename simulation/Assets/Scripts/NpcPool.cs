@@ -2,10 +2,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public class ObjectPool : MonoBehaviour
+public class NpcPool : MonoBehaviour
 {
-    public static ObjectPool SharedInstance;
+    public static NpcPool SharedInstance;
     public List<GameObject> pooledObjects;
+
+    private Vector2[] targetLineSegment = new Vector2[2];
 
     void Awake()
     {
@@ -15,6 +17,11 @@ public class ObjectPool : MonoBehaviour
     void Start()
     {
         
+    }
+
+    public void SetTargetLineSegment(Vector2[] lineSegment)
+    {
+        targetLineSegment = lineSegment;
     }
 
     // Update is called once per frame
@@ -61,7 +68,7 @@ public class ObjectPool : MonoBehaviour
         return null;
     }
 
-    public static ObjectPool GetInstance()
+    public static NpcPool GetInstance()
     {
         return SharedInstance;
     }

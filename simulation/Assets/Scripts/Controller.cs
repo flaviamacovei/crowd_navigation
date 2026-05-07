@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class PlayerControl : MonoBehaviour
+public class Controller : MonoBehaviour
 {
     public GameObject player;
     float objectRadius;
@@ -32,11 +32,15 @@ public class PlayerControl : MonoBehaviour
 
         // npcs have white colour
         player.GetComponent<SpriteRenderer>().color = npcColour;
-        ObjectPool.GetInstance().PlaceObjects(player, positions);
+        NpcPool.GetInstance().PlaceObjects(player, positions);
 
         // player has red colour
         player.GetComponent<SpriteRenderer>().color = playerColour;
         Player.GetInstance().PlacePlayer(player, playerPosition);
+
+        // set npc target
+        Vector2[] targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
+        NpcPool.GetInstance().SetTargetLineSegment(targetLineSegment);
     }
 
     // Update is called once per frame
