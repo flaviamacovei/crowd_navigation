@@ -19,17 +19,24 @@ public class NpcPool : MonoBehaviour
         
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+        List<GameObject> activeObjects = GetPooledObjects(true);
+
+        for (int i = 0; i < activeObjects.Count; i++)
+        {
+            GameObject obj = activeObjects[i];
+            Vector2 currentPosition = obj.transform.position;
+            Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
+        }
+    }
+
     public void SetTargetLineSegment(Vector2[] lineSegment)
     {
         targetLineSegment = lineSegment;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    
     public void PlaceObjects(GameObject objectToPlace, List<Vector2> positions)
     {
         int numObjects = positions.Count;
@@ -58,14 +65,28 @@ public class NpcPool : MonoBehaviour
 
     public GameObject GetPooledObject()
     {
-        for(int i = 0; i < pooledObjects.Count; i++)
+        for (int i = 0; i < pooledObjects.Count; i++)
         {
-            if(!pooledObjects[i].activeInHierarchy)
+            if (!pooledObjects[i].activeInHierarchy)
             {
                 return pooledObjects[i];
             }
         }
         return null;
+    }
+
+    public List<GameObject> GetPooledObjects(bool active = false)
+    {
+        List<GameObject> objects = new List<GameObject>();
+
+        for (int i = 0; i < pooledObjects.Count; i++)
+        {
+            if (pooledObjects[i].activeInHierarchy == active) // if object's activity status matches desired activity, proceed
+            {
+                objects.Add(pooledObjects[i]);
+            }
+        }
+        return objects;
     }
 
     public static NpcPool GetInstance()

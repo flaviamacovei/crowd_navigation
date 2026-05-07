@@ -402,7 +402,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 10
   height: 10
-  borderWidth: 1
   exitPc: 0.5
   exitSize: 2
   player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
