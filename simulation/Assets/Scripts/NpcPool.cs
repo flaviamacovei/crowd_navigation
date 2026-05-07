@@ -6,6 +6,7 @@ public class NpcPool : MonoBehaviour
 {
     public static NpcPool SharedInstance;
     public List<GameObject> pooledObjects;
+    public float stepLength = 1.0f;
 
     private Vector2[] targetLineSegment = new Vector2[2];
 
@@ -29,6 +30,20 @@ public class NpcPool : MonoBehaviour
             GameObject obj = activeObjects[i];
             Vector2 currentPosition = obj.transform.position;
             Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
+
+            Vector2 direction;
+
+            if ((targetPosition - currentPosition).sqrMagnitude < stepLength)
+            {
+                direction = targetPosition - currentPosition;
+            }
+            else
+            {
+                direction = Vector3.Normalize(targetPosition - currentPosition) * stepLength;
+            }
+
+            Vector2 newPosition = currentPosition + direction;
+            obj.transform.position = newPosition;
         }
     }
 

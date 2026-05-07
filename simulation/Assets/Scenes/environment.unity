@@ -388,6 +388,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pooledObjects: []
+  stepLength: 0.0001
 --- !u!114 &1772429114
 MonoBehaviour:
   m_ObjectHideFlags: 0
