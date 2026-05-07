@@ -20,7 +20,9 @@ public class ObjectPool : MonoBehaviour
     void Start()
     {
         Bounds spawnBounds = Boundary.GetInstance().GetSpawningBounds();
-        List<Vector2> positions = GetSpawnPositions(objectRadius, spawnBounds);
+        Vector2 spawnCentre = spawnBounds.center;
+        Vector2 spawnSize = (Vector2)spawnBounds.size - new Vector2(objectRadius, objectRadius);
+        List<Vector2> positions = GetSpawnPositions(objectRadius, new Bounds(spawnCentre, spawnSize));
         numObjects = positions.Count;
         PoolObjects();
 
