@@ -6,9 +6,6 @@ public class NpcPool : MonoBehaviour
 {
     public static NpcPool SharedInstance;
     public List<GameObject> pooledObjects;
-    private float speed = 1.0f;
-
-    private Vector2[] targetLineSegment = new Vector2[2];
 
     void Awake()
     {
@@ -23,6 +20,11 @@ public class NpcPool : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+    }
+
+    public void NpcUpdate(Vector2[] targetLineSegment, float speed)
+    {
         List<GameObject> activeObjects = GetPooledObjects(true);
 
         for (int i = 0; i < activeObjects.Count; i++)
@@ -31,32 +33,24 @@ public class NpcPool : MonoBehaviour
             Vector2 currentPosition = obj.transform.position;
             Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
 
-            Rigidbody2D rigidBody = obj.GetComponent<Rigidbody2D>();
-
-            Vector2 direction;
-
-            if ((targetPosition - currentPosition).sqrMagnitude < speed)
+            // if target position lies to the right of the object: target reached -> deactivate
+            bool targetReached = targetPosition.x > currentPosition.x;
+            if (targetReached)
             {
-                direction = targetPosition - currentPosition;
+                obj.SetActive(false);
             }
+
+            // else: move in the direction of target
             else
             {
-                direction = Vector3.Normalize(targetPosition - currentPosition) * speed;
+                Rigidbody2D rigidBody = obj.GetComponent<Rigidbody2D>();
+                Vector2 exactDirection = Vector3.Normalize(targetPosition - currentPosition);
+                Vector2 randomDirection = new Vector2(UnityEngine.Random.value, UnityEngine.Random.value);
+                rigidBody.AddForce((exactDirection + randomDirection) * speed, ForceMode2D.Force);
             }
-
-            rigidBody.AddForce(direction, ForceMode2D.Force);
         }
     }
 
-    public void SetTargetLineSegment(Vector2[] lineSegment)
-    {
-        targetLineSegment = lineSegment;
-    }
-    
-    public void SetSpeed(float newSpeed)
-    {
-        speed = newSpeed;
-    }
     
     public void PlaceObjects(GameObject objectToPlace, List<Vector2> positions)
     {

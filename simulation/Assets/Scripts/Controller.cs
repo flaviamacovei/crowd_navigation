@@ -11,6 +11,7 @@ public class Controller : MonoBehaviour
     private Color playerColour = Color.red;
     private Color npcColour = Color.white;
     public float speed = 1.0f;
+    private Vector2[] targetLineSegment;
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -40,18 +41,14 @@ public class Controller : MonoBehaviour
         player.GetComponent<SpriteRenderer>().color = playerColour;
         Player.GetInstance().PlacePlayer(player, playerPosition);
 
-        // set npc target
-        Vector2[] targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
-        NpcPool.GetInstance().SetTargetLineSegment(targetLineSegment);
-
-        // set speed property
-        NpcPool.GetInstance().SetSpeed(speed);
-        Player.GetInstance().SetSpeed(speed);
+        // exit target
+        targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        NpcPool.GetInstance().NpcUpdate(targetLineSegment, speed);
+        Player.GetInstance().PlayerUpdate(speed);
     }
 }
