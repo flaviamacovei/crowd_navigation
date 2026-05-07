@@ -8,7 +8,7 @@ public class Boundary : MonoBehaviour
     
     public int width = 10;
     public int height = 10;
-    public int borderWidth = 1;
+    private int borderWidth = 1;
     public float exitPc = 0.5f;
     public int exitSize = 2;
     public GameObject player;
@@ -19,31 +19,38 @@ public class Boundary : MonoBehaviour
     private SpriteRenderer sr;
     private Vector2 textureSize;
 
-    private float referenceSize;
     private BoxCollider2D[] colliders;
     private CompositeCollider2D compositeCollider;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        referenceSize = player.GetComponent<Renderer>().bounds.size.x;
+        SharedInstance = this;
+    }
+    
+    void Start()
+    {
+        
+    }
 
+
+    public void CreateBoundary(float referenceSize)
+    {
         // set rectangle sizes
         Vector2 worldSize = new Vector2(width * referenceSize, height * referenceSize);
         Rectangle.SetWorldSize(worldSize);
         Vector2 textureSize = new Vector2(width * referenceSize * dpi, height * referenceSize * dpi);
         Rectangle.SetTextureSize(textureSize);
 
-
-        SharedInstance = this;
+        // create boundary
         CreateGameObject();
-        CreateBorderPoints();
-        Texture2D texture = CreateTexture();
+        int[] pxSize = new[] { (int)(width * referenceSize * dpi), (int)(height * referenceSize * dpi) };
+        int pxExitSize = (int)(exitSize * referenceSize * dpi);
+        int pxBorderWidth = (int)(borderWidth * referenceSize * dpi);
+
+        CreateBorderPoints(pxSize, pxExitSize, pxBorderWidth);
+        Texture2D texture = CreateTexture(pxSize);
         CreateSprite(texture);
-    }
-    
-    void Start()
-    {
         CreateCollider();
     }
 
@@ -53,13 +60,11 @@ public class Boundary : MonoBehaviour
         sr = boundaryObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
     }
 
-    private void CreateBorderPoints()
+    private void CreateBorderPoints(int[] pxSize, int pxExitSize, int pxBorderWidth)
     {
-        int pxWidth = (int)(width * referenceSize * dpi);
-        int pxHeight = (int)(height * referenceSize * dpi);
-        int pxExitSize = (int)(exitSize * referenceSize * dpi);
+        int pxWidth = pxSize[0];
+        int pxHeight = pxSize[1];
 
-        int pxBorderWidth = (int)(borderWidth * referenceSize * dpi);
         int exitStart = (int)(pxHeight * exitPc - pxExitSize / 2);
         int exitEnd = (int)(pxHeight * exitPc + pxExitSize / 2);
         if (exitStart < pxBorderWidth)
@@ -114,12 +119,9 @@ public class Boundary : MonoBehaviour
 
     }
     
-    private Texture2D CreateTexture()
+    private Texture2D CreateTexture(int[] textureSize)
     {
-        float referenceSize = player.GetComponent<Renderer>().bounds.size.x;
-        int pxWidth = (int)(width * referenceSize * dpi);
-        int pxHeight = (int)(height * referenceSize * dpi); // THIS IS DUPLICATED FIX
-        Texture2D texture = new Texture2D(pxWidth, pxHeight, TextureFormat.RGBA32, false);
+        Texture2D texture = new Texture2D(textureSize[0], textureSize[1], TextureFormat.RGBA32, false);
 
         Color transparent = new Color(0, 0, 0, 0);
         Color white = Color.white;

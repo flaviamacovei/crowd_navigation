@@ -18,6 +18,9 @@ public class PlayerControl : MonoBehaviour
         Vector2 objectSize = player.GetComponent<Renderer>().bounds.size;
         objectRadius = Math.Max(objectSize.x, objectSize.y);
 
+        // create boundary
+        Boundary.GetInstance().CreateBoundary(objectRadius);
+
         Bounds spawnBounds = Boundary.GetInstance().GetSpawningBounds();
         Vector2 spawnCentre = spawnBounds.center;
         Vector2 spawnSize = (Vector2)spawnBounds.size - new Vector2(objectRadius, objectRadius);
