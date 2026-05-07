@@ -13,3 +13,12 @@ wheels/
 simulation/Library
 simulation/Temp
 simulation/Logs
+simulation/UserSettings
+simulation/Assembly-CSharp.csproj
+
+# auxilliary files
+**/*.meta
+**/*.bkp
+
+# report
+report/*
