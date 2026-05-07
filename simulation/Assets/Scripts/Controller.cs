@@ -10,6 +10,7 @@ public class Controller : MonoBehaviour
     float objectRadius;
     private Color playerColour = Color.red;
     private Color npcColour = Color.white;
+    public float speed = 1.0f;
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -42,6 +43,10 @@ public class Controller : MonoBehaviour
         // set npc target
         Vector2[] targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
         NpcPool.GetInstance().SetTargetLineSegment(targetLineSegment);
+
+        // set speed property
+        NpcPool.GetInstance().SetSpeed(speed);
+        Player.GetInstance().SetSpeed(speed);
     }
 
     // Update is called once per frame

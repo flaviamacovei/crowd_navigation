@@ -6,7 +6,7 @@ public class NpcPool : MonoBehaviour
 {
     public static NpcPool SharedInstance;
     public List<GameObject> pooledObjects;
-    public float stepLength = 1.0f;
+    private float speed = 1.0f;
 
     private Vector2[] targetLineSegment = new Vector2[2];
 
@@ -31,25 +31,31 @@ public class NpcPool : MonoBehaviour
             Vector2 currentPosition = obj.transform.position;
             Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
 
+            Rigidbody2D rigidBody = obj.GetComponent<Rigidbody2D>();
+
             Vector2 direction;
 
-            if ((targetPosition - currentPosition).sqrMagnitude < stepLength)
+            if ((targetPosition - currentPosition).sqrMagnitude < speed)
             {
                 direction = targetPosition - currentPosition;
             }
             else
             {
-                direction = Vector3.Normalize(targetPosition - currentPosition) * stepLength;
+                direction = Vector3.Normalize(targetPosition - currentPosition) * speed;
             }
 
-            Vector2 newPosition = currentPosition + direction;
-            obj.transform.position = newPosition;
+            rigidBody.AddForce(direction, ForceMode2D.Force);
         }
     }
 
     public void SetTargetLineSegment(Vector2[] lineSegment)
     {
         targetLineSegment = lineSegment;
+    }
+    
+    public void SetSpeed(float newSpeed)
+    {
+        speed = newSpeed;
     }
     
     public void PlaceObjects(GameObject objectToPlace, List<Vector2> positions)
@@ -73,6 +79,7 @@ public class NpcPool : MonoBehaviour
         for (int i = 0; i < numObjects; i++)
         {
             tmp = Instantiate(objectToPool);
+            tmp.name = "npc_" + i;
             tmp.SetActive(false);
             pooledObjects.Add(tmp);
         }

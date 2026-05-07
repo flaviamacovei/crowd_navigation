@@ -388,7 +388,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pooledObjects: []
-  stepLength: 0.0001
 --- !u!114 &1772429114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -419,6 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
+  speed: 0.5
 --- !u!114 &1772429116
 MonoBehaviour:
   m_ObjectHideFlags: 0
