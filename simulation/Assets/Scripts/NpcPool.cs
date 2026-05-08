@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Linq;
 
 public class NpcPool : MonoBehaviour
 {
@@ -25,34 +27,46 @@ public class NpcPool : MonoBehaviour
 
     public void NpcUpdate(Vector2[] targetLineSegment, float speed)
     {
+        // List<GameObject> activeObjects = GetPooledObjects(true).OrderBy(i => Guid.NewGuid()).ToList();
+        // listOfThings.OrderBy(i => Guid.NewGuid()).ToList()
         List<GameObject> activeObjects = GetPooledObjects(true);
+
+        System.Random rnd = new System.Random();
+        int updateIndex = rnd.Next(0, activeObjects.Count);
 
         for (int i = 0; i < activeObjects.Count; i++)
         {
-            GameObject obj = activeObjects[i];
-            Vector2 currentPosition = obj.transform.position;
-            Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
+            GameObject obj = activeObjects[updateIndex];
+            ObjectUpdate(obj, targetLineSegment, speed);
+        }
+    }
 
-            // if target position lies to the right of the object: target reached -> deactivate
-            bool targetReached = targetPosition.x > currentPosition.x;
-            if (targetReached)
-            {
-                obj.SetActive(false);
-            }
+    private void ObjectUpdate(GameObject obj, Vector2[] targetLineSegment, float speed)
+    {
+        Vector2 currentPosition = obj.transform.position;
+        // Vector2 targetPosition = Utils.GetClosestPointOnTarget(targetLineSegment, currentPosition);
+        Vector2 targetPosition = (targetLineSegment[1] + targetLineSegment[0]) / 2.0f;
 
-            // else: move in the direction of target
-            else
-            {
-                Rigidbody2D rigidBody = obj.GetComponent<Rigidbody2D>();
-                Vector2 exactDirection = Vector3.Normalize(targetPosition - currentPosition);
-                Vector2 randomDirection = new Vector2(UnityEngine.Random.value, UnityEngine.Random.value);
-                rigidBody.AddForce((exactDirection + randomDirection) * speed, ForceMode2D.Force);
-            }
+        // if target position lies to the right of the object: target reached -> deactivate
+        bool targetReached = targetPosition.x > currentPosition.x;
+        if (targetReached)
+        {
+            obj.SetActive(false);
+        }
+
+        // else: move in the direction of target
+        else
+        {
+            Rigidbody2D rigidBody = obj.GetComponent<Rigidbody2D>();
+            Vector2 exactDirection = Vector3.Normalize(targetPosition - currentPosition);
+            Vector2 randomDirection = new Vector2(UnityEngine.Random.value - 0.5f, UnityEngine.Random.value - 0.5f);
+
+            rigidBody.AddForce((exactDirection + randomDirection) * speed, ForceMode2D.Force);
         }
     }
 
     
-    public void PlaceObjects(GameObject objectToPlace, List<Vector2> positions)
+    public void PlaceObjects(GameObject objectToPlace, List<Vector2> positions, List<Color> colours)
     {
         int numObjects = positions.Count;
         PoolObjects(numObjects, objectToPlace);
@@ -62,6 +76,7 @@ public class NpcPool : MonoBehaviour
             Vector2 position = positions[i];
             GameObject obj = GetPooledObject();
             obj.transform.position = position;
+            obj.GetComponent<SpriteRenderer>().color = colours[i];
             obj.SetActive(true);
         }
     }
