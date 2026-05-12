@@ -12,14 +12,14 @@ public class Boundary : MonoBehaviour
     public float exitPc = 0.5f;
     public int exitSize = 2;
     public GameObject player;
-    readonly int dpi = 600;
-    private Rectangle[] rectangles;
+    readonly int dpi = 200;
+    private Dictionary<string, Rectangle> rectangles;
     private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
     private Vector2 textureSize;
 
-    private BoxCollider2D[] colliders;
+    private List<BoxCollider2D> colliders;
     private CompositeCollider2D compositeCollider;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -89,26 +89,27 @@ public class Boundary : MonoBehaviour
         Vector2 g = new Vector2(pxBorderWidth, pxBorderWidth);
         Vector2 h = new Vector2(pxBorderWidth, exitStart);
 
-        Rectangle bottomLeft = new Rectangle(a, h, "texture");
-        Rectangle bottom = new Rectangle(b, g, "texture");
-        Rectangle right = new Rectangle(b, c, "texture");
-        Rectangle top = new Rectangle(d, f, "texture");
-        Rectangle topLeft = new Rectangle(d, e, "texture");
-
-        rectangles = new[] { bottomLeft, bottom, right, top, topLeft };
+        rectangles = new Dictionary<string, Rectangle>
+        {
+            { "bottomLeft", new Rectangle(a, h, "texture") },
+            { "bottom", new Rectangle(b, g, "texture") },
+            { "right", new Rectangle(b, c, "texture") },
+            { "top", new Rectangle(d, f, "texture") },
+            { "topLeft", new Rectangle(d, e, "texture") }
+        };
     }
 
     private void CreateCollider()
     {
         // add partial colliders
-        colliders = new BoxCollider2D[rectangles.Length];
-        for (int i = 0; i < rectangles.Length; i++)
+        colliders = new List<BoxCollider2D>();
+        foreach( string key in rectangles.Keys )
         {
-            Bounds rectangleBounds = rectangles[i].GetWorldBounds();
+            Bounds rectangleBounds = rectangles[key].GetWorldBounds();
             BoxCollider2D collider = boundaryObject.AddComponent<BoxCollider2D>();
             collider.offset = rectangleBounds.center;
             collider.size = rectangleBounds.size;
-            colliders[i] = collider;
+            colliders.Add(collider);
         }
         // merge into composite collider
         compositeCollider = boundaryObject.AddComponent<CompositeCollider2D>();
@@ -132,8 +133,10 @@ public class Boundary : MonoBehaviour
             {
                 Vector2 px = new Vector2(x, y);
 
+                List<Rectangle> rectangleList = rectangles.Values.ToList();
+                
                 IEnumerable<bool> inRectangles =
-                    from rectangle in rectangles
+                    from rectangle in rectangleList
                     where rectangle.GetTextureBounds().Contains(px)
                     select true;
                 bool inRectangle = inRectangles.Any();
@@ -177,8 +180,8 @@ public class Boundary : MonoBehaviour
 
     public Vector2[] GetTargetLineSegment()
     {
-        Rectangle bottomLeft = rectangles[0];
-        Rectangle topLeft = rectangles[4];
+        Rectangle bottomLeft = rectangles["bottomLeft"];
+        Rectangle topLeft = rectangles["topLeft"];
 
         Vector2 lowerEnd = new Vector2(
             bottomLeft.GetWorldBounds().max.x,
