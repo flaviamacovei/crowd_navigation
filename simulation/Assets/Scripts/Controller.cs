@@ -33,21 +33,15 @@ public class Controller : MonoBehaviour
 
         // npcs get colour based on their position
         List<Color> colours = Utils.GetNpcColours(positions, spawnBounds);
-        NpcPool.GetInstance().PlaceObjects(player, positions, colours);
 
         // player has red colour
         player.GetComponent<SpriteRenderer>().color = Color.red;
         Player.GetInstance().PlacePlayer(player, playerPosition);
-
-
-        // exit target
-        targetLineSegment = Boundary.GetInstance().GetTargetLineSegment();
     }
 
     // Update is called once per frame
     void Update()
     {
-        NpcPool.GetInstance().NpcUpdate(targetLineSegment, speed);
         Player.GetInstance().PlayerUpdate(speed);
     }
 }
