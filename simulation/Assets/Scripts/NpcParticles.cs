@@ -25,7 +25,7 @@ public class NpcParticles : MonoBehaviour
         
     }
 
-    public void CreateParticleEmitter(Rectangle location, SpriteRenderer spriteRenderer)
+    public void CreateParticleEmitter(Rectangle location, SpriteRenderer spriteRenderer, Collider2D collider)
     {
         GameObject emitterObject = new GameObject("emitter");
         ParticleSystem emitterSystem = emitterObject.AddComponent<ParticleSystem>();
@@ -46,6 +46,14 @@ public class NpcParticles : MonoBehaviour
         particleRenderer.renderMode = ParticleSystemRenderMode.Billboard;
         particleRenderer.material = new Material(Shader.Find("Sprites/Default"));
         particleRenderer.material.mainTexture = spriteRenderer.sprite.texture;
+
+        ParticleSystem.CollisionModule collision = emitterSystem.collision;
+        collision.enabled = true;
+        collision.type = ParticleSystemCollisionType.World;
+        collision.mode = ParticleSystemCollisionMode.Collision2D;
+        collision.colliderForce = 1.0f;
+
+        collision.SetPlane(0, collider.transform);
     }
 
     public void CreateParticleAttractor(Rectangle location)
