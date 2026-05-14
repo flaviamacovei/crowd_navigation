@@ -178,21 +178,37 @@ public class Boundary : MonoBehaviour
         return new Bounds(centre, spawnSizeWorld);
     }
 
-    public Vector2[] GetTargetLineSegment()
+    public Rectangle GetFarEdge()
+    {
+        Rectangle bottom = rectangles["bottom"];
+        Rectangle top = rectangles["top"];
+        Rectangle right = rectangles["right"];
+
+        Vector2 lowerEnd = new Vector2(
+            bottom.GetWorldBounds().max.x,
+            bottom.GetWorldBounds().max.y
+        );
+
+        Vector2 upperEnd = new Vector2(
+            right.GetWorldBounds().max.x,
+            top.GetWorldBounds().min.y
+        );
+
+        return new Rectangle(lowerEnd, upperEnd, "world");
+    }
+
+    public Rectangle GetExitRectangle()
     {
         Rectangle bottomLeft = rectangles["bottomLeft"];
         Rectangle topLeft = rectangles["topLeft"];
 
-        Vector2 lowerEnd = new Vector2(
-            bottomLeft.GetWorldBounds().max.x,
-            bottomLeft.GetWorldBounds().max.y
-        );
-        Vector2 upperEnd = new Vector2(
-            topLeft.GetWorldBounds().max.x,
-            topLeft.GetWorldBounds().min.y
+        Rectangle output = new Rectangle(
+            bottomLeft.GetWorldBounds().max,
+            topLeft.GetWorldBounds().min,
+            "world"
         );
 
-        return new[] { lowerEnd, upperEnd };
+        return output;
     }
 
     public static Boundary GetInstance()
