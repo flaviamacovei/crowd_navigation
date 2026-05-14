@@ -4,9 +4,9 @@ using System;
 using System.Collections;
 using System.Linq;
 
-public class NpCParticles : MonoBehaviour
+public class NpcParticles : MonoBehaviour
 {
-    public static NpCParticles SharedInstance;
+    public static NpcParticles SharedInstance;
     public List<GameObject> pooledObjects;
 
     void Awake()
@@ -25,17 +25,35 @@ public class NpCParticles : MonoBehaviour
         
     }
 
-    public void CreateParticleEmitter(Vector2[] location)
+    public void CreateParticleEmitter(Rectangle location, SpriteRenderer spriteRenderer)
+    {
+        GameObject emitterObject = new GameObject("emitter");
+        ParticleSystem emitterSystem = emitterObject.AddComponent<ParticleSystem>();
+
+        Bounds bounds = location.GetWorldBounds();
+
+        // set location
+        Vector2 centre = bounds.center;
+        emitterObject.transform.Translate(centre);
+
+        // set scale
+        var sh = emitterSystem.shape;
+        sh.shapeType = ParticleSystemShapeType.Box;
+        sh.scale = bounds.size;
+
+        // set material
+        ParticleSystemRenderer particleRenderer = emitterSystem.GetComponent<ParticleSystemRenderer>();
+        particleRenderer.renderMode = ParticleSystemRenderMode.Billboard;
+        particleRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        particleRenderer.material.mainTexture = spriteRenderer.sprite.texture;
+    }
+
+    public void CreateParticleAttractor(Rectangle location)
     {
         
     }
 
-    public void CreateParticleAttractor(Rectangle extent)
-    {
-        
-    }
-
-    public static NpCParticles GetInstance()
+    public static NpcParticles GetInstance()
     {
         return SharedInstance;
     }
