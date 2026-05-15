@@ -69,13 +69,19 @@ public class NpcParticles : MonoBehaviour
         Bounds bounds = location.GetWorldBounds();
 
         // set location
-        Vector2 centre = bounds.center;
+        Vector2 centre = new Vector2(
+            bounds.min.x,
+            (bounds.min.y + bounds.max.y) / 2
+        );
         emitterObject.transform.Translate(centre);
+
+        // set rotation
+        emitterObject.transform.Rotate(new Vector3(0, -90, 90));
 
         // set scale
         var sh = emitterSystem.shape;
         sh.shapeType = ParticleSystemShapeType.Box;
-        sh.scale = bounds.size;
+        sh.scale = new Vector3(bounds.size.y, 1, 0);
         var main = emitterSystem.main;
         main.startSize = size;
 
@@ -107,6 +113,7 @@ public class NpcParticles : MonoBehaviour
         attractorSystem.endRange = range;
         attractorSystem.rotationSpeed = 0;
         attractorSystem.rotationAttraction = 0;
+        attractorCollider.size = bounds.size;
 
         attractorCollider.isTrigger = false;
 
