@@ -36,7 +36,18 @@ public class Controller : MonoBehaviour
 
         // player has red colour
         player.GetComponent<SpriteRenderer>().color = Color.red;
-        Player.GetInstance().PlacePlayer(player, playerPosition);
+        // Player.GetInstance().PlacePlayer(player, playerPosition);
+
+        Rectangle emitterLocation = Boundary.GetInstance().GetFarEdge();
+        Rectangle attractorLocation = Boundary.GetInstance().GetExitRectangle();
+        Vector2 boundarySize = Boundary.GetInstance().GetWorldSize();
+        float attractorRange = Math.Max(boundarySize.x, boundarySize.y);
+
+        SpriteRenderer playerRenderer = player.GetComponent<SpriteRenderer>();
+        Collider2D playerCollider = player.GetComponent<Collider2D>();
+        NpcParticles.GetInstance().CreateParticleEmitter(emitterLocation, objectRadius, playerRenderer);
+        NpcParticles.GetInstance().CreateParticleAttractor(attractorLocation, playerCollider, attractorRange);
+        // NpcParticles.GetInstance().PlaceObjects(player, positions, colours);
     }
 
     // Update is called once per frame

@@ -211,6 +211,11 @@ public class Boundary : MonoBehaviour
         return output;
     }
 
+    public Vector2 GetWorldSize()
+    {
+        return sr.bounds.size;
+    }
+
     public static Boundary GetInstance()
     {
         return SharedInstance;
