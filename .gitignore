@@ -18,6 +18,7 @@ simulation/Assembly-CSharp.csproj
 simulation/.vscode
 simulation/Assets/Settings
 simulation/ProjectSettings
+simulation/Assets/SceneDependencyCache
 
 # auxilliary files
 **/*.meta
