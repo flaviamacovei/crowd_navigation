@@ -63,6 +63,75 @@ public class Rectangle
         return textureBounds;
     }
 
+    public Vector2[] GetBottomLineSegment(string space)
+    {
+        Bounds referenceBounds = space == "world"? worldBounds : textureBounds;
+
+        return new[]
+        {
+            new Vector2(
+                referenceBounds.min.x,
+                referenceBounds.min.y
+            ),
+            new Vector2(
+                referenceBounds.max.x,
+                referenceBounds.min.y
+            )
+        };
+    }
+
+    public Vector2[] GetTopLineSegment(string space)
+    {
+        Bounds referenceBounds = space == "world"? worldBounds : textureBounds;
+
+        return new[]
+        {
+            new Vector2(
+                referenceBounds.min.x,
+                referenceBounds.max.y
+            ),
+            new Vector2(
+                referenceBounds.max.x,
+                referenceBounds.max.y
+            )
+        };
+    }
+
+    public Vector2[] GetLeftLineSegment(string space)
+    {
+        Bounds referenceBounds = space == "world"? worldBounds : textureBounds;
+
+        return new[]
+        {
+            new Vector2(
+                referenceBounds.min.x,
+                referenceBounds.min.y
+            ),
+            new Vector2(
+                referenceBounds.min.x,
+                referenceBounds.max.y
+            )
+        };
+    }
+
+    public Vector2[] GetRightLineSegment(string space)
+    {
+        Bounds referenceBounds = space == "world"? worldBounds : textureBounds;
+
+        return new[]
+        {
+            new Vector2(
+                referenceBounds.max.x,
+                referenceBounds.min.y
+            ),
+            new Vector2(
+                referenceBounds.max.x,
+                referenceBounds.max.y
+            )
+        };
+    }
+
+
     public static Bounds ConvertWorld2Texture(Bounds bounds)
     {
         Vector2 oldSize = bounds.size;

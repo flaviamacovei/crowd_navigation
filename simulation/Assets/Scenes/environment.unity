@@ -456,7 +456,7 @@ MonoBehaviour:
   height: 10
   exitPc: 0.5
   exitSize: 5
-  player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
+  player: {fileID: 7848560942275684139, guid: fa4a3eeba5432eb42af434187fa2eb9f, type: 3}
 --- !u!114 &1772429115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -469,7 +469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b707b333f18ed434ca09301760111efd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1284108403872571515, guid: 1daf4c241d3d0eb4aa72b64a97bc950a, type: 3}
+  player: {fileID: 7848560942275684139, guid: fa4a3eeba5432eb42af434187fa2eb9f, type: 3}
   speed: 0.5
 --- !u!114 &1772429116
 MonoBehaviour:
