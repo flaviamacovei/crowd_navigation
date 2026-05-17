@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Mathematics;
 
 public static class Utils
 {
@@ -88,11 +89,40 @@ public static class Utils
         return false;
     }
 
-    public static Vector2 GetClosestPointOnTarget(Vector2[] target, Vector2 point)
+    public static Vector2 GetClosestPointOnTarget2D(Vector2[] target, Vector2 point)
     {
-        Vector2 start = target[0];
-        Vector2 stop = target[1];
-        Vector2 direction = stop - start;
+        // convert to float3
+        float3 start3D = new float3(
+            target[0].x,
+            target[0].y,
+            0
+        );
+        float3 stop3D = new float3(
+            target[1].x,
+            target[1].y,
+            0
+        );
+        float3[] target3D = new[] {start3D, stop3D};
+        float3 point3D = new float3
+        (
+            point.x,
+            point.y,
+            0
+        );
+        
+        // run logic
+        float3 closestPoint3D = GetClosestPointOnTarget3D(target3D, point3D);
+
+        // convert back to Vector2
+        return new Vector2(closestPoint3D.x, closestPoint3D.y);
+    }
+
+    public static float3 GetClosestPointOnTarget3D(float3[] target, float3 point)
+    {
+        float3 start = target[0];
+        float3 stop = target[1];
+        float3 direction = stop - start;
+        Debug.Log("vectors: " + start + ", " + stop + ", " + point);
         // variable point v(t) = start + t * direction
         // distance point-v is minimal <=> vector point-v is orthogonal to direction <=> point-v * direction = 0
         // (point             - (start             + t * direction)) * direction  = 0
@@ -100,9 +130,10 @@ public static class Utils
         //  point * direction -  start * direction - t * direction   * direction  = 0
         //  point * direction -  start * direction                                = t * direction   * direction
         // (point * direction -  start * direction) /     (direction * direction) = t
-        float t = (Vector2.Dot(point, direction) - Vector2.Dot(start, direction)) / Vector2.Dot(direction, direction);
+        float t = (math.dot(point, direction) - math.dot(start, direction)) / math.dot(direction, direction);
+        Debug.Log("t: " + t);
 
-        Vector2 closestPoint;
+        float3 closestPoint;
         if (t <= 0)
         {
             closestPoint = start;

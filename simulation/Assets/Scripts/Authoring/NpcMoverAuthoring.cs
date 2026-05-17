@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 
 public class NpcMoverAuthoring : MonoBehaviour
 {
@@ -21,4 +22,6 @@ public class NpcMoverAuthoring : MonoBehaviour
 public struct NpcMover : IComponentData
 {
     public float moveSpeed;
+    public float3 targetLineSegmentStart;
+    public float3 targetLineSegmentStop;
 }
