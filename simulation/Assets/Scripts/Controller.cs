@@ -65,8 +65,6 @@ public class Controller : MonoBehaviour
         float3 targetLineSegmentStart = new float3(targetLineSegment2D[0].x, targetLineSegment2D[0].y, 0);
         float3 targetLineSegmentStop = new float3(targetLineSegment2D[1].x, targetLineSegment2D[1].y, 0);
         
-
-        NativeArray<Entity> entityArray = entityQuery.ToEntityArray(Allocator.Temp);
         NativeArray<NpcMover> npcMoverArray = entityQuery.ToComponentDataArray<NpcMover>(Allocator.Temp);
 
         for (int i = 0; i < npcMoverArray.Length; i++)
@@ -75,7 +73,8 @@ public class Controller : MonoBehaviour
             npcMover.targetLineSegmentStart = targetLineSegmentStart;
             npcMover.targetLineSegmentStop = targetLineSegmentStop;
 
-            entityManager.SetComponentData(entityArray[i], npcMover);
+            npcMoverArray[i] = npcMover;
         }
+        entityQuery.CopyFromComponentDataArray(npcMoverArray);
     }
 }

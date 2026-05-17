@@ -20,6 +20,7 @@ simulation/Assets/Settings
 simulation/ProjectSettings
 simulation/Assets/SceneDependencyCache
 simulation/ProjectSettings
+simulation/UserSettings
 
 # auxilliary files
 **/*.meta

@@ -122,7 +122,6 @@ public static class Utils
         float3 start = target[0];
         float3 stop = target[1];
         float3 direction = stop - start;
-        Debug.Log("vectors: " + start + ", " + stop + ", " + point);
         // variable point v(t) = start + t * direction
         // distance point-v is minimal <=> vector point-v is orthogonal to direction <=> point-v * direction = 0
         // (point             - (start             + t * direction)) * direction  = 0
@@ -131,7 +130,6 @@ public static class Utils
         //  point * direction -  start * direction                                = t * direction   * direction
         // (point * direction -  start * direction) /     (direction * direction) = t
         float t = (math.dot(point, direction) - math.dot(start, direction)) / math.dot(direction, direction);
-        Debug.Log("t: " + t);
 
         float3 closestPoint;
         if (t <= 0)
