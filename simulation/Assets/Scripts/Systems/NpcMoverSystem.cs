@@ -11,23 +11,22 @@ partial struct NpcMoverSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        foreach ((
-            RefRW<LocalTransform> localTransform, 
-            RefRO<NpcMover> npcMover,
-            RefRW<PhysicsVelocity> physicsVelocity) 
-            in SystemAPI.Query<
-                RefRW<LocalTransform>, 
-                RefRO<NpcMover>,
-                RefRW<PhysicsVelocity>>())
-        {
+        NpcMoverJob npcMoverJob = new NpcMoverJob();
+        npcMoverJob.ScheduleParallel();
+    }
+}
 
-            float3 targetPosition = Utils.GetClosestPointOnTarget3D(new[] {npcMover.ValueRO.targetLineSegmentStart, npcMover.ValueRO.targetLineSegmentStop}, localTransform.ValueRO.Position);
+[BurstCompile]
+public partial struct NpcMoverJob : IJobEntity
+{
+    public void Execute(ref LocalTransform localTransform, in NpcMover npcMover, ref PhysicsVelocity physicsVelocity)
+    {
+        float3 targetPosition = Utils.GetClosestPointOnTarget3D(new[] {npcMover.targetLineSegmentStart, npcMover.targetLineSegmentStop}, localTransform.Position);
 
-            float3 moveDirection = targetPosition - localTransform.ValueRO.Position;
-            moveDirection = math.normalize(moveDirection);
+        float3 moveDirection = targetPosition - localTransform.Position;
+        moveDirection = math.normalize(moveDirection);
 
-            physicsVelocity.ValueRW.Linear = moveDirection * npcMover.ValueRO.moveSpeed;
-            physicsVelocity.ValueRW.Angular = float3.zero;
-        }
+        physicsVelocity.Linear = moveDirection * npcMover.moveSpeed;
+        physicsVelocity.Angular = float3.zero;
     }
 }
