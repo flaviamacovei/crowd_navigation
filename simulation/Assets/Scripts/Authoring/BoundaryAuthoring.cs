@@ -3,11 +3,14 @@ using UnityEditor;
 #endif
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System;
 using Unity.Entities;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 public class BoundaryAuthoring : MonoBehaviour
 {
@@ -19,17 +22,19 @@ public class BoundaryAuthoring : MonoBehaviour
     private int borderWidth = 1;
     readonly int dpi = 200;
     private Dictionary<string, Rectangle> rectangles;
-    [SerializeField] private GameObject boundaryObject;
+    private GameObject boundaryObject;
     private Sprite boundary;
     private SpriteRenderer sr;
     private Vector2 textureSize;
     private List<BoxCollider> colliders;
     private string boundaryObjectName = "boundaryObject";
+    private float referenceSize;
+    private bool boundaryExists;
 
     public void CreateBoundary()
     {
         Vector2 objectSize = referenceObject.GetComponent<Renderer>().bounds.size;
-        float referenceSize = Math.Max(objectSize.x, objectSize.y);
+        referenceSize = Math.Max(objectSize.x, objectSize.y);
         
         // set rectangle sizes
         Vector2 worldSize = new Vector2(width * referenceSize, height * referenceSize);
@@ -47,6 +52,7 @@ public class BoundaryAuthoring : MonoBehaviour
         Texture2D texture = CreateTexture(pxSize);
         CreateSprite(texture);
         CreateCollider();
+        boundaryExists = true;
     }
 
     private void CreateGameObject()
@@ -58,9 +64,13 @@ public class BoundaryAuthoring : MonoBehaviour
             gameObject.scene
         );
         boundaryObject.transform.SetParent(transform);
-        // boundaryObject.hideFlags = HideFlags.DontSaveInBuild;
 
         sr = boundaryObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
+    }
+
+    public float GetReferenceSize()
+    {
+        return referenceSize;
     }
 
 
@@ -217,7 +227,6 @@ public class BoundaryAuthoring : MonoBehaviour
             topLeft.GetWorldBounds().min,
             "world"
         );
-
         return output;
     }
 
@@ -229,10 +238,18 @@ public class BoundaryAuthoring : MonoBehaviour
 
     public void CleanUp()
     {
-        if (boundaryObject != null)
+        GameObject existingBoundaryObject = GameObject.Find(boundaryObjectName);
+        while (existingBoundaryObject != null)
         {
-            DestroyImmediate(boundaryObject);
+            DestroyImmediate(existingBoundaryObject);
+            existingBoundaryObject = GameObject.Find(boundaryObjectName);
         }
+        boundaryExists = false;
+    }
+
+    public bool BoundaryExists()
+    {
+        return boundaryExists;
     }
 
     private void DelayedRebuild()
@@ -252,25 +269,46 @@ public class BoundaryAuthoring : MonoBehaviour
         {
             Entity entity = GetEntity(TransformUsageFlags.Dynamic);
 
-            Rectangle exitRectangle = authoring.GetExitRectangle();
-            Vector2[] targetLineSegment2D = exitRectangle.GetRightLineSegment("world");
-
-            float3 targetLineSegmentStart = new float3(targetLineSegment2D[0].x, targetLineSegment2D[0].y, 0);
-            float3 targetLineSegmentStop = new float3(targetLineSegment2D[1].x, targetLineSegment2D[1].y, 0);
-            
-            AddComponent(entity, new Boundary
+            if (authoring.BoundaryExists())
             {
-                boundaryObject = GetEntity(authoring.boundaryObject, TransformUsageFlags.Dynamic),
-                targetLineSegmentStart = targetLineSegmentStart,
-                targetLineSegmentStop = targetLineSegmentStop
-            });
+
+                Rectangle exitRectangle = authoring.GetExitRectangle();
+                Vector2[] targetLineSegment2D = exitRectangle.GetRightLineSegment("world");
+                float3 targetLineSegmentStart = new float3(targetLineSegment2D[0].x, targetLineSegment2D[0].y, 0);
+                float3 targetLineSegmentStop = new float3(targetLineSegment2D[1].x, targetLineSegment2D[1].y, 0);
+
+                Bounds spawnBounds = authoring.GetSpawningBounds();
+
+                float radius = authoring.GetReferenceSize();
+
+                List<Vector2> spawnPositions = Utils.GetSpawnPositions(radius, spawnBounds);
+
+                Debug.Log("making an unsafe list of length " + spawnPositions.Count);
+                UnsafeList<float2> spawnPositionsUnsafe = new UnsafeList<float2>(spawnPositions.Count, Allocator.Persistent);
+                
+                for (int i = 0; i < spawnPositions.Count; i++)
+                {
+                    spawnPositionsUnsafe.Add((float2)spawnPositions[i]);
+                }
+                Debug.Log("made a list of " + spawnPositionsUnsafe.Length + " items");
+            
+                AddComponent(entity, new Boundary
+                {
+                    boundaryObject = GetEntity(authoring.boundaryObject, TransformUsageFlags.Dynamic),
+                    targetLineSegmentStart = targetLineSegmentStart,
+                    targetLineSegmentStop = targetLineSegmentStop,
+                    spawnPositionsUnsafe = spawnPositionsUnsafe
+                });
+            }
         }
     }
 }
 
+[ChunkSerializable]
 public struct Boundary : IComponentData
 {
     public Entity boundaryObject;
     public float3 targetLineSegmentStart;
     public float3 targetLineSegmentStop;
+    public UnsafeList<float2> spawnPositionsUnsafe;
 }

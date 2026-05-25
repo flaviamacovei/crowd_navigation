@@ -404,7 +404,6 @@ GameObject:
   - component: {fileID: 1772429112}
   - component: {fileID: 1772429115}
   - component: {fileID: 1772429113}
-  - component: {fileID: 1772429114}
   - component: {fileID: 1772429116}
   m_Layer: 0
   m_Name: controller
@@ -440,23 +439,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 265c82f9bf61c2442a0a37e9878ffd7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1772429114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1772429111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9130c139cd49b6d47acc8a3dac7b9235, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  width: 10
-  height: 10
-  exitPc: 0.5
-  exitSize: 5
-  player: {fileID: 7848560942275684139, guid: fa4a3eeba5432eb42af434187fa2eb9f, type: 3}
 --- !u!114 &1772429115
 MonoBehaviour:
   m_ObjectHideFlags: 0
