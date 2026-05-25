@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4667324048954457330}
   - component: {fileID: 8696164545032663680}
   - component: {fileID: 4251244411963828485}
+  - component: {fileID: 8141310522473128526}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -141,3 +142,16 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8141310522473128526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7848560942275684139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06a2718205eddeb46950a4035f57c670, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcMoverAuthoring
+  moveSpeed: 2
