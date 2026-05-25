@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Mathematics;
 
 public static class Utils
 {
