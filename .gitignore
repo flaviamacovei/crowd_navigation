@@ -15,6 +15,9 @@ simulation/Temp
 simulation/Logs
 simulation/UserSettings
 simulation/Assembly-CSharp.csproj
+simulation/.vscode
+simulation/Assets/Settings
+simulation/ProjectSettings
 
 # auxilliary files
 **/*.meta
