@@ -9,7 +9,6 @@ partial struct BoundarySpawnerSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         EntityCommandBuffer entityCommandBuffer = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
-        // Boundary boundary = SystemAPI.GetSingleton<Boundary>();
         foreach ((
             RefRO<BoundarySpawner> boundarySpawner,
             RefRO<Boundary> boundary,
