@@ -151,7 +151,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7848560942275684139}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06a2718205eddeb46950a4035f57c670, type: 3}
+  m_Script: {fileID: 11500000, guid: 61c47bb24d5c48c478094605600f7aa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcMoverAuthoring
   moveSpeed: 2
