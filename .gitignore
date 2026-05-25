@@ -10,17 +10,17 @@ wheels/
 .venv
 
 # Unity
-simulation/Library
-simulation/Temp
-simulation/Logs
-simulation/UserSettings
+simulation/Library/*
+simulation/Temp/*
+simulation/Logs/*
+simulation/UserSettings/*
 simulation/Assembly-CSharp.csproj
-simulation/.vscode
-simulation/Assets/Settings
-simulation/ProjectSettings
-simulation/Assets/SceneDependencyCache
-simulation/ProjectSettings
-simulation/UserSettings
+simulation/.vscode/*
+simulation/Assets/Settings/*
+simulation/ProjectSettings/*
+simulation/Assets/SceneDependencyCache/*
+simulation/ProjectSettings/*
+simulation/UserSettings/*
 
 # auxilliary files
 **/*.meta
