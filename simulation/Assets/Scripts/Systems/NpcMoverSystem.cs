@@ -7,11 +7,16 @@ using UnityEngine;
 
 partial struct NpcMoverSystem : ISystem
 {
-
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        NpcMoverJob npcMoverJob = new NpcMoverJob();
+        Boundary boundary = SystemAPI.GetSingleton<Boundary>();
+        NpcMoverJob npcMoverJob = new NpcMoverJob
+        {
+            targetLineSegmentStart = boundary.targetLineSegmentStart,
+            targetLineSegmentStop = boundary.targetLineSegmentStop,
+            distanceThreshold = 0.1f,
+        };
         npcMoverJob.ScheduleParallel();
     }
 }
@@ -19,14 +24,24 @@ partial struct NpcMoverSystem : ISystem
 [BurstCompile]
 public partial struct NpcMoverJob : IJobEntity
 {
-    public void Execute(ref LocalTransform localTransform, in NpcMover npcMover, ref PhysicsVelocity physicsVelocity)
+    public float3 targetLineSegmentStart;
+    public float3 targetLineSegmentStop;
+    public float distanceThreshold;
+    public void Execute(ref LocalTransform localTransform, ref NpcMover npcMover, ref PhysicsVelocity physicsVelocity)
     {
-        float3 targetPosition = Utils.GetClosestPointOnTarget3D(new[] {npcMover.targetLineSegmentStart, npcMover.targetLineSegmentStop}, localTransform.Position);
-
+        float3 targetPosition = Utils.GetClosestPointOnTarget3D(new[] {targetLineSegmentStart, targetLineSegmentStop}, localTransform.Position);
+        
         float3 moveDirection = targetPosition - localTransform.Position;
-        moveDirection = math.normalize(moveDirection);
 
-        physicsVelocity.Linear = moveDirection * npcMover.moveSpeed;
-        physicsVelocity.Angular = float3.zero;
+        if (math.lengthsq(moveDirection) < distanceThreshold)
+        {
+            npcMover.queuedForDestruction = true;
+        }
+        else
+        {
+            moveDirection = math.normalize(moveDirection);
+            physicsVelocity.Linear = moveDirection * npcMover.moveSpeed;
+            physicsVelocity.Angular = float3.zero;
+        }
     }
 }

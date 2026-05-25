@@ -14,18 +14,12 @@ partial struct NpcDestroyerSystem : ISystem
         EntityCommandBuffer entityCommandBuffer = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
         foreach ((
-            RefRO<LocalTransform> localTransform,
             RefRO<NpcMover> npcMover,
             Entity entity)
             in SystemAPI.Query<
-                RefRO<LocalTransform>,
                 RefRO<NpcMover>>().WithEntityAccess())
         {
-            float distanceThreshold = 0.1f;
-            float3 targetPosition = Utils.GetClosestPointOnTarget3D(new[] {npcMover.ValueRO.targetLineSegmentStart, npcMover.ValueRO.targetLineSegmentStop}, localTransform.ValueRO.Position);
-
-            float3 moveDirection = targetPosition - localTransform.ValueRO.Position;
-            if (math.lengthsq(moveDirection) < distanceThreshold)
+            if (npcMover.ValueRO.queuedForDestruction)
             {
                 entityCommandBuffer.DestroyEntity(entity);
             }
